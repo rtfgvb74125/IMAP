@@ -1,0 +1,751 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>IMAP_MAP</title>
+    <script type="text/javascript" src="Map.js"></script>
+    <script src="https://api.mapbox.com/mapbox-gl-js/v1.10.1/mapbox-gl.js"></script>
+    <link href="https://api.mapbox.com/mapbox-gl-js/v1.10.1/mapbox-gl.css" rel="stylesheet" />
+    <style>
+        body { margin: 0; padding: 0; }
+        #map { position: absolute; top: 0; bottom: 0; width: 100%; }
+
+        body::-webkit-scrollbar {
+            display: none;
+        }
+        .SliderL {
+            position: absolute;
+            z-index: 2;
+            left: 1px;
+            top: 20px;
+            width: 40px;
+            height: 150px;
+            background-color: white;
+            border-top-right-radius: 20px;
+            border-bottom-right-radius: 20px;
+        }
+
+        .SliderL p {
+            font-size: 20px;
+            line-height: 6px;
+            letter-spacing: 10px;
+            text-align: center;
+            font-family: "Microsoft JhengHei";
+        }
+
+        .SliderL img {
+            position: relative;
+            top: -10px;
+            width: 30px;
+        }
+
+        .SliderL:hover {
+            box-shadow: 4px 4px 1px gray;
+            background-color: #ff7d23;
+            cursor: pointer;
+        }
+
+        .sidenavL .OutButton{
+            background-color: #F77A4E;
+            position: absolute;
+            top: 20px;
+            z-index: 9;
+            width: 248px;
+            height: 45px;
+            border-top-right-radius: 20px;
+            border-bottom-right-radius: 20px;
+            box-shadow: 4px 8px 6px #00000029;
+        }
+        .sidenavL .OutButton:hover{
+            background-color: rgba(247, 182, 45, 0.98);
+            cursor: pointer;
+        }
+        .SliderR {
+            position: absolute;
+            z-index: 2;
+            right: 1px;
+            top: 20px;
+            width: 40px;
+            height: 130px;
+            background-color: white;
+            border-top-left-radius: 20px;
+            border-bottom-left-radius: 20px;
+        }
+
+        .SliderR p {
+            font-size: 20px;
+            line-height: 6px;
+            letter-spacing: 10px;
+            text-align: right;
+            font-family: "Microsoft JhengHei";
+        }
+
+        .SliderR:hover {
+            box-shadow: 4px 4px 1px gray;
+            background-color: #F4784D;
+            cursor: pointer;
+        }
+
+        .sidenavL {
+            height: 100%;
+            width: 0;
+            position: fixed;
+            z-index: 9;
+            top: 0;
+            left: 0;
+            background-color: #ffffff;
+            overflow-x: hidden;
+            transition: 0.5s;
+            padding-top: 60px;
+        }
+
+        .sidenavL .closebtn {
+            position: absolute;
+            top: 0;
+            right: 25px;
+            font-size: 36px;
+            margin-left: 50px;
+        }
+
+        /*RWD*/
+        @media screen and (max-height: 450px) {
+            .sidenavL {
+                padding-top: 15px;
+            }
+        }
+
+        /**/
+        .sidenavL img {
+            position: relative;
+            top: 7px;
+            left: 200px;
+            width: 30px;
+        }
+
+        .sidenavR {
+            height: 100%;
+            width: 0;
+            position: fixed;
+            z-index: 9;
+            top: 0;
+            right: 0;
+            overflow-x: hidden;
+            transition: 0.5s;
+            padding-top: 60px;
+            background-color: rgb(255,82,82);
+        }
+
+        .sidenavR .closebtn {
+            position: absolute;
+            top: 0;
+            right: 450px;
+            font-size: 36px;
+            margin-left: 50px;
+        }
+
+        .sidenavR img {
+            width: 30px;
+        }
+
+        .sidenavL .container{
+            display: block;
+            position: relative;
+            padding-left: 70px;
+            margin-bottom: 20px;
+            top: 30px;
+            cursor: pointer;
+            font-size: 20px;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+            font-family: "Microsoft JhengHei";
+        }
+        .sidenavL .container input{
+            position: absolute;
+            opacity: 0;
+            cursor: pointer;
+            height: 0;
+            width: 0;
+        }
+        .sidenavL .container .checkmark{
+            position: absolute;
+            top: 2px;
+            left: 30px;
+            height: 18px;
+            width: 18px;
+            background-color: #ffffff;
+            border-style: solid;
+            border-color: #707070;
+            border-width: 3px;
+        }
+        .container:hover input ~ .checkmark {
+            background-color: #FFD1C3;
+        }
+        .container input:checked ~ .checkmark {
+            background-color: #f77a41;
+        }
+        .checkmark:after {
+            content: "";
+            position: absolute;
+            display: none;
+        }
+        .container input:checked ~ .checkmark:after {
+            display: block;
+        }
+        .container .checkmark:after {
+            left: 5px;
+            top: 1px;
+            width: 5px;
+            height: 10px;
+            border: solid white;
+            border-width: 0 3px 3px 0;
+            -webkit-transform: rotate(45deg);
+            -ms-transform: rotate(45deg);
+            transform: rotate(45deg);
+        }
+        .sidenavL .mapmarker {
+            width: 17px;
+            height: 22px;
+            vertical-align: middle;
+            position: relative;
+            top: -5px;
+            left: 10px;
+        }
+        .sidenavL hr{
+            position: relative;
+            top: 50px;
+            left: 0;
+            width: 90%;
+        }
+        .sidenavL .botton{
+            width: 220px;
+            height: 100px;
+            position: relative;
+            z-index: 9;
+            top: 50px;
+            left: 10px;
+        }
+        .botton img{
+            position: relative;
+            left: 15px;
+            top: 10px;
+            padding: 15px;
+        }
+        .sidenavL .imapicon{
+            position: relative;
+            top: 130px;
+            left: 0px;
+        }
+        .sidenavL .emailfont{
+            position: relative;
+            top: 85px;
+            left: 40px;
+        }
+
+        .textin h2{
+            display: inline;
+        }
+    </style>
+
+    <style>
+        body { margin: 0; padding: 0; }
+        #map { position: absolute; top: 0; bottom: 0; width: 100%; }
+    </style>
+</head>
+
+
+<body>
+
+<style>
+    .legend {
+        background-color: #fff;
+        border-radius: 3px;
+        bottom: 30px;
+        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+        font: 12px/20px 'Helvetica Neue', Arial, Helvetica, sans-serif;
+        padding: 10px;
+        position: absolute;
+        right: 10px;
+        z-index: 1;
+    }
+
+    .legend h4 {
+        margin: 0 0 10px;
+    }
+
+    .legend div span {
+        border-radius: 50%;
+        display: inline-block;
+        height: 10px;
+        margin-right: 5px;
+        width: 10px;
+    }
+
+</style>
+
+<!--地圖本體-->
+<div id="map"></div>
+
+<div class="SliderL" onclick="openLNav()">
+    <p>選</p>
+    <p>擇</p>
+    <p>景</p>
+    <p>點</p>
+    <img src="image/icons8-right-arrow-50.png">
+</div>
+
+<div class="SliderR" onclick="openRNav()">
+    <p>詳</p>
+    <p>細</p>
+    <p>資</p>
+    <p>訊</p>
+</div>
+<!--左邊伸縮欄位Start-->
+<div class="sidenavL" id="LeftSidenav">
+    <div class="OutButton" class="closebtn" onclick="closeLNav()">
+        <img src="image/icons8-long-arrow-left-50.png">
+    </div>
+
+    <form>
+        <label class="container">熱門景點
+            <input type="checkbox" id="Popular" name="Popular" value="Popular">
+            <span class="checkmark"></span>
+            <span><img class="mapmarker" src="image/red.png"></span>
+        </label>
+
+        <label class="container">最新景點
+            <input type="checkbox" id="New" name="New" value="New">
+            <span class="checkmark"></span>
+            <span><img class="mapmarker" src="image/blue.png"></span>
+        </label>
+
+        <label class="container">網美聖地
+            <input type="checkbox" id="Model" name="Model" value="Model">
+            <span class="checkmark"></span>
+            <span><img class="mapmarker" src="image/yellow.png"></span>
+        </label>
+
+        <label class="container">藝術畫展
+            <input type="checkbox" id="Art" name="Art" value="Art">
+            <span class="checkmark"></span>
+            <span><img class="mapmarker" src="image/black.png"></span>
+        </label>
+
+        <label class="container">情侶約會
+            <input type="checkbox" id="Date" name="Date" value="Date">
+            <span class="checkmark"></span>
+            <span><img class="mapmarker" src="image/pink.png"></span>
+        </label>
+
+        <label class="container">親子出遊
+            <input type="checkbox" id="Parent_child" name="Parent_child" value="Parent_child">
+            <span class="checkmark"></span>
+            <span><img class="mapmarker" src="image/green.png"></span>
+        </label>
+    </form>
+    <hr>
+    <div class="botton">
+        <a href="index.html"><img src="image/home.png" title="回到首頁" alt="回到首頁"></a>
+        <a href="#favorite"><img src="image/favorite.png" style="width: 40px;height: 40px;position: relative;top: 15px" title="我的標籤" alt="我的標籤"></a>
+        <a href="#member"><img src="image/member.png" title="會員資訊" alt="會員資訊"></a>
+    </div>
+    <img class="imapicon" src="IMAPicon.png"><p class="emailfont">IMAP@imap.com.tw</p>
+</div>
+<!--左邊伸縮欄位end-->
+
+<!--右邊伸縮欄位START-->
+<div class="sidenavR" id="RightSidenav">
+    <a href="javascript:void(0)" class="closebtn" onclick="closeRNav()"><img src="image/icons8-right-arrow-50.png"></a>
+    <h1 id="title">This is test title</h1>
+    <!--    <img src="" style="width: 100px;height: 50px">-->
+    <div class="textin">
+        <h2>電話：</h2>
+        <h2 id="phone">04-23323456</h2>
+    </div>
+    <div class="textin">
+        <h2>地址：</h2>
+        <h2 id="address">霧峰區</h2>
+    </div>
+    <h2>內容</h2>
+    <p id = content>亞洲大學，簡稱亞大，是一所位於臺灣臺中市霧峰區的私立大學，前身為臺中健康暨管理學院。學術單位包括醫學暨健康學院、資訊電機學院、管理學院、人文社會學院、創意設計學院、護理學院、國際學院、人工智慧學院，共8學院29學系。 作為一個新設的大學，亞洲大學經過近二十年的努力，獲致不錯的校務與教育成就，國際能見度漸增。</p>
+    <div class="textin">
+        <h2>網址：</h2>
+        <h2 id="website">asia.edu.tw</h2>
+    </div>
+</div>
+<!--右邊伸縮欄位END-->
+<script>
+    //左右兩邊旁移式選單移出所展現的大小
+    function openLNav() {
+        document.getElementById("LeftSidenav").style.width = "250px";
+    }
+
+    function closeLNav() {
+        document.getElementById("LeftSidenav").style.width = "0";
+    }
+
+    function openRNav() {
+        document.getElementById("RightSidenav").style.width = "500px";
+    }
+
+    function closeRNav() {
+        document.getElementById("RightSidenav").style.width = "0";
+    }
+</script>
+<script>
+    //Mapbox的金鑰，每個帳戶都有，注意流量，使用太多就需要付費
+    mapboxgl.accessToken = 'pk.eyJ1IjoicGVuZ3Vpbm1pa2UiLCJhIjoiY2s3dnV0YWd1MGh2MDNscGNnMWIyZHh5YyJ9.udjOQ8G53zlNRi3CLwzhdA';
+
+    //初始化地圖
+    var map = new mapboxgl.Map({
+        container: 'map',
+        //這邊可以抓自己用Mapbox Studio畫好的地圖樣式
+        style: 'mapbox://styles/penguinmike/ckatd4mka3lcd1iqprlv7n9pr',
+        //設定地圖中心
+        center: [120.687107, 24.046195],
+        minZoom: 3,
+        //設定初始地圖的Zoom
+        zoom: 8
+    });
+
+    //讓地圖讀取資料，設定資料來源與資料屬性(cluster可以讓多個相近的點合併)
+    map.on('load', function() {
+
+        // addSource Strat+++
+        map.addSource('travel_random', {
+            type: 'geojson',
+            data:
+            // 'outPutGeojson_test_random.geojson',
+            //     'outPutGeojson_test_02.geojson',
+                'outPutGeojson_final.geojson',
+            // 'outPutGeojson_test_02.geojson'
+            cluster: true,
+            // clusterMaxZoom: 11, // Max zoom to cluster points on
+            // clusterRadius: 80 // Radius of each cluster when clustering points (defaults to 50)
+
+        });
+        // addSoure End---
+
+        //在地圖上面抓取我們放的資料並用點呈現，這邊的設定會讓點變成藍色的(總共六層,但因為有bug所以每一層都一樣)
+        // addLayer Start+++
+        map.addLayer(
+            {   'id': 'point_fun_level1', //設定該層Layer的ID
+                'source': 'travel_random', //設定資料來源，這裡的名稱跟addsource有關
+                // 'source-layer': 'point_fun_level4',
+                'type': 'circle', //設定該筆資料如何呈現
+                // 'maxzoom': zoomThreshold,
+                'filter': ['==','Level', '1'], //設定過濾器，但這邊設定有些問題,所以有設跟沒設一樣
+                'paint': { //設定點的顏色 大小 樣式
+                    'circle-color': '#11b4da',
+                    'circle-radius': 8,
+                    'circle-stroke-width': 2,
+                    'circle-stroke-color': '#fff'
+                },
+                'layout': { //設定布局，這邊設置成一開始不顯示
+                    'visibility':'none'
+                    // 'icon-allow-overlap': true
+                }
+            });
+        map.addLayer(
+            {   'id': 'point_fun_level2',
+                'source': 'travel_random',
+                // 'source-layer': 'point_fun_level4',
+                'type': 'circle',
+                // 'maxzoom': zoomThreshold,
+                'filter': ['==','Level', '2'],
+                'paint': {
+                    'circle-color': '#11b4da',
+                    'circle-radius': 8,
+                    'circle-stroke-width': 2,
+                    'circle-stroke-color': '#fff'
+                },
+                'layout': {
+                    'visibility':'none'
+                    // 'icon-allow-overlap': true
+                }
+            });
+        map.addLayer(
+            {   'id': 'point_fun_level3',
+                'source': 'travel_random',
+                // 'source-layer': 'point_fun_level4',
+                'type': 'circle',
+                // 'maxzoom': zoomThreshold,
+                'filter': ['==','Level', '3'],
+                'paint': {
+                    'circle-color': '#11b4da',
+                    'circle-radius': 8,
+                    'circle-stroke-width': 2,
+                    'circle-stroke-color': '#fff'
+                },
+                'layout': {
+                    'visibility':'none'
+                    // 'icon-allow-overlap': true
+                }
+            });
+        map.addLayer(
+            {   'id': 'point_fun_level4',
+                'source': 'travel_random',
+                // 'source-layer': 'point_fun_level4',
+                'type': 'circle',
+                // 'maxzoom': zoomThreshold,
+                'filter': ['==','Level', '4'],
+                'paint': {
+                    'circle-color': '#11b4da',
+                    'circle-radius': 8,
+                    'circle-stroke-width': 2,
+                    'circle-stroke-color': '#fff'
+                },
+                'layout': {
+                    'visibility':'none'
+                    // 'icon-allow-overlap': true
+                }
+            });
+        map.addLayer(
+            {   'id': 'point_fun_level5',
+                'source': 'travel_random',
+                // 'source-layer': 'point_fun_level4',
+                'type': 'circle',
+                // 'maxzoom': zoomThreshold,
+                'filter': ['==','Level', '5'],
+                'paint': {
+                    'circle-color': '#11b4da',
+                    'circle-radius': 8,
+                    'circle-stroke-width': 2,
+                    'circle-stroke-color': '#fff'
+                },
+                'layout': {
+                    'visibility':'none'
+                    // 'icon-allow-overlap': true
+                }
+            });
+        map.addLayer(
+            {   'id': 'point_fun_level6',
+                'source': 'travel_random',
+                // 'source-layer': 'point_fun_level4',
+                'type': 'circle',
+                // 'maxzoom': zoomThreshold,
+                'filter': ['==','Level', '6'],
+                'paint': {
+                    'circle-color': '#11b4da',
+                    'circle-radius': 8,
+                    'circle-stroke-width': 2,
+                    'circle-stroke-color': '#fff'
+                },
+                'layout': {
+                    'visibility':'none'
+                    // 'icon-allow-overlap': true
+                }
+            });
+        // addLayer End---
+
+        // 設定變數，讓svg替換上面標好的點
+        var markers = {};
+        var markersOnScreen = {};
+        var location_Name = "";
+
+        // 開一個專門更新標點的function，結合下面畫svg的function把原本的點都換成熱氣球
+        function updateMarkers() {
+
+            var newMarkers = {};
+            //從上面的source查詢每一筆資料,並且放進features
+            var features = map.querySourceFeatures('travel_random');
+            // var features_test = map.queryRenderedFeatures({layers: ['point_fun_level1']});
+
+            // for迴圈跑每一筆features 然後把座標跟屬性都放進變數中
+            for (var i = 0; i < features.length; i++) {
+                var coords = features[i].geometry.coordinates;
+
+                var props = features[i].properties;
+                location_Name = features[i].properties.Location;
+                // location_Name = JSON.stringify(features[i].properties.location_name);
+                // console.log(features[i].properties.Location);
+
+                // if (!props.cluster) continue;
+                var id = props.ID;
+
+                var marker = markers[id];
+                //只要在地圖有出現點且還不是熱氣球的點都替換成熱氣球
+                if (!marker) {
+                    // console.log(id,location_Name);
+                    var el = createDonutChart(props,location_Name); //將屬性丟給畫熱氣球的function,且保存成一個變數
+                    // var el = createDonutChart(props);
+
+                    // 把拿到資料的熱氣球生成，並給予座標
+                    marker = markers[id] = new mapboxgl.Marker({
+                        element: el
+                    }).setLngLat(coords);
+                }
+                newMarkers[id] = marker;
+                // 將不在地圖上且已經有資料的熱氣球放進去地圖
+                if (!markersOnScreen[id]) marker.addTo(map);
+            }
+// for every marker we've added previously, remove those that are no longer visible
+            // 因為地圖縮放會讓標點出現或消失，所以這邊是標點消失的時候讓氣球跟著消失
+            for (id in markersOnScreen) {
+                if (!newMarkers[id]) markersOnScreen[id].remove();
+            }
+            markersOnScreen = newMarkers;
+        }
+
+        // function createDonutChart(props) {
+        // 畫氣球BJ4
+        function createDonutChart(props,location_Name) {
+
+            // 這邊接上面更新用的function傳下來的資料
+            var location_name = location_Name;
+
+            // 這邊開始畫氣球，感謝照宇大神的氣球，雖然我畫的很差XD
+            var html =
+
+                // 這句加了一個onclick是讓氣球被點到的時候可以在右邊顯示詳細資料
+                "<div><button id = "+location_name+" type=\"button\" style='border-style: none;background-color: transparent' onclick='buttonShowProp(this.id)'><svg width='68.94' height='91.92' viewbox='0 0 689.438 919.25'>" +
+                "<g id=\"Group_121\" data-name=\"Group 121\" transform=\"translate(-4417 -4288.75)\">" +
+
+                "<g id=\"Group_76\" data-name=\"Group 76\" transform=\"translate(4417 4288.75)\" opacity=\"0.742\">" +
+
+                "<g id=\"Group_51\" data-name=\"Group 51\" transform=\"translate(0 0)\">" +
+                "<path id=\"Path_25\" data-name=\"Path 25\" d=\"M408.719,0C218.606,0,64,154.606,64,344.719c0,238.948,311.166,552.872,324.38,566.143a28.851,28.851,0,0,0,40.677,0c13.214-13.271,324.38-327.2,324.38-566.143C753.438,154.606,598.831,0,408.719,0Zm0,517.078c-95.027,0-172.359-77.332-172.359-172.359s77.332-172.359,172.359-172.359,172.359,77.332,172.359,172.359S503.746,517.078,408.719,517.078Z\" transform=\"translate(-64)\" fill=\"red\"/>" +
+                "</g>" +
+
+                "<ellipse id=\"Ellipse_3\" data-name=\"Ellipse 3\" cx=\"177.919\" cy=\"177.919\" rx=\"177.919\" ry=\"177.919\" transform=\"translate(169.023 163.093)\" fill=\"red\"/>" +
+                "</g>" +
+
+                "<text id=" + location_Name  + "  transform = 'translate(4570.21 4608.531)' fill='#fff' font-size= '123' font-family = 'PingFangTC-Regular, PingFang TC' letter-spacing='0.06em'><tspan x=0 y=0>"+ location_Name +"</tspan></text>" +
+                // "<text id= '哭啊'  transform = 'translate(4570.21 4608.531)' fill='#fff' font-size= '123' font-family = 'PingFangTC-Regular, PingFang TC' letter-spacing='0.06em'><tspan x=0 y=0>"+ location_Name +"</tspan></text>" +
+                "<text id=\"Hsing_Tian_Kong\" data-name=\"Hsing Tian Kong\" transform=\"translate(4584.138 4722.138)\" fill=\"#fff\" font-size=\"41\" font-family=\"HelveticaNeue, Helvetica Neue\" letter-spacing=\"0.06em\"><tspan x=\"0\" y=\"0\">Hsing Tian Kong</tspan></text>" +
+                "</g>" +
+                "</svg></button>";
+
+            // 生成html語法，把氣球吹起來
+            var el = document.createElement('div');
+            el.innerHTML = html;
+            // 把氣球傳回去
+            return el.firstChild;
+        }
+
+        // 這邊就是讓地圖有動作時更新氣球
+        map.on('data', function(e) {
+            if (e.sourceId !== 'travel_random' || !e.isSourceLoaded) return;
+
+            map.on('move', updateMarkers);
+            map.on('moveend', updateMarkers);
+            // map.on('click',function (ck) {
+            //     console.log(ck.features.properties);
+            // });
+            updateMarkers();
+        });
+
+    });
+    // map.on('load') End -----
+
+    // 這邊讓氣球被點到的時候讓右邊的視窗彈出來顯示詳細資料
+    function buttonShowProp(test){
+        console.log(test);
+        // 變數name接傳進來的地點名稱
+        var name = test;
+        // 查詢source裡面的資料
+        var features = map.querySourceFeatures('travel_random');
+        // 讓右邊的資訊欄跳出來
+        document.getElementById("RightSidenav").style.width = "500px";
+
+        // for迴圈比對資料
+        for(var i = 0;i<features.length;i++){
+            // 與傳進來的名稱相符，把其他資料放進右邊資訊欄
+            if(name===features[i].properties.Location){
+                document.getElementById('title').innerHTML = features[i].properties.Location;
+                document.getElementById('phone').innerHTML = features[i].properties.Phone;
+                document.getElementById('address').innerHTML = features[i].properties.Address;
+                document.getElementById('content').innerHTML = features[i].properties.Content;
+                // document.getElementById('content').innerHTML = features[i].properties.Level;
+                document.getElementById('website').innerHTML = features[i].properties.Webisite;
+
+            }
+        }
+        // alert(test);
+    }
+
+    // 這邊讓左邊的checkbox可以選擇想看的資料，但是有bug所以每一個checkbox都一樣,勾起來會全部出現,取消勾選要再移動一次才會消失
+    document.getElementById('Popular').onclick = function() {
+        // alert(document.querySelector('input[type=checkbox][name=Popular]:checked').value);
+        if(document.querySelector('input[type=checkbox][name=Popular]:checked')){
+            map.setLayoutProperty('point_fun_level1','visibility','visible')
+        }else{
+            map.setLayoutProperty('point_fun_level1','visibility','none')
+            console.log("qaq")
+        }
+    }
+    document.getElementById('New').onclick = function() {
+        // alert(document.querySelector('input[type=checkbox][name=Popular]:checked').value);
+        if(document.querySelector('input[type=checkbox][name=New]:checked')){
+            map.setLayoutProperty('point_fun_level2','visibility','visible')
+        }else{
+            map.setLayoutProperty('point_fun_level2','visibility','none')
+            console.log("qaq")
+        }
+    }
+    document.getElementById('Model').onclick = function() {
+        // alert(document.querySelector('input[type=checkbox][name=Popular]:checked').value);
+        if(document.querySelector('input[type=checkbox][name=Model]:checked')){
+            map.setLayoutProperty('point_fun_level3','visibility','visible')
+        }else{
+            map.setLayoutProperty('point_fun_level3','visibility','none')
+            console.log("qaq")
+        }
+    }
+    document.getElementById('Art').onclick = function() {
+        // alert(document.querySelector('input[type=checkbox][name=Popular]:checked').value);
+        if(document.querySelector('input[type=checkbox][name=Art]:checked')){
+            map.setLayoutProperty('point_fun_level4','visibility','visible')
+        }else{
+            map.setLayoutProperty('point_fun_level4','visibility','none')
+            console.log("qaq")
+        }
+    }
+    document.getElementById('Date').onclick = function() {
+        // alert(document.querySelector('input[type=checkbox][name=Popular]:checked').value);
+        if(document.querySelector('input[type=checkbox][name=Date]:checked')){
+            map.setLayoutProperty('point_fun_level5','visibility','visible')
+        }else{
+            map.setLayoutProperty('point_fun_level5','visibility','none')
+            console.log("qaq")
+        }
+    }
+    document.getElementById('Parent_child').onclick = function() {
+        // alert(document.querySelector('input[type=checkbox][name=Popular]:checked').value);
+        if(document.querySelector('input[type=checkbox][name=Parent_child]:checked')){
+            map.setLayoutProperty('point_fun_level6','visibility','visible')
+        }else{
+            map.setLayoutProperty('point_fun_level6','visibility','none')
+            console.log("qaq")
+        }
+    }
+
+    // function buttonShowProp(test){
+    //     console.log(test);
+    //     var name = test;
+    //     for(var i = 0;i<json;i++){
+    //         if(name===user[i].location){
+    //             document.getElementById('title').innerHTML = user[i].location;
+    //             document.getElementById('phone').innerHTML = user[i].phone;
+    //             document.getElementById('address').innerHTML = user[i].address;
+    //             document.getElementById('content').innerHTML = user[i].content;
+    //             document.getElementById('website').innerHTML = user[i].website;
+    //         }
+    //     }
+    //     // alert(test);
+    // }
+
+</script>
+<!--<script>-->
+<!--    //get marker's name then output that data-->
+<!--    //input location name = name,send = marker's id-->
+<!--    function outdata() {-->
+<!--        var name = document.getElementById('send').value;-->
+<!--    }-->
+<!--</script>-->
+<!--<p id="demo"></p>-->
+
+
+</body>
+</html>

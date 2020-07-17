@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>IMAP</title>
+    <script src='https://kit.fontawesome.com/a076d05399.js'></script>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+    <link href="//netdna.bootstrapcdn.com/font-awesome/4.1.0/css/font-awesome.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="hover.css" type="text/css">
+    <style>
+        /*強制關閉chromeXY scroll*/
+        body::-webkit-scrollbar {
+            display: none;
+        }
+
+        /**/
+        body {
+            position: relative;
+        }
+
+        .box {
+            width: 100vw;
+            height: 100vh;
+            /*background-color: red;*/
+            /*background-image: url("image/DemoBG.jpg") ;*/
+            background: url("image/DemoBG.jpg") center center fixed no-repeat ;
+            background-size:cover;
+            margin: 0;
+            padding: 0;
+            /*overflow-x: hidden;*/
+            /*overflow-y: hidden;*/
+            position: absolute;
+            z-index: 1;
+            /*background-repeat:no-repeat;*/
+            /*background-size:1800px 650px ;*/
+        }
+
+        .boxL {
+            width: 10vw;
+            height: 100vh;
+            background: rgba(16, 77, 24, 0.2);
+            position: absolute;
+            z-index: 2;
+            left: 0px;
+        }
+
+        .boxR {
+            width: 10vw;
+            height: 100vh;
+            background: rgba(16, 77, 24, 0.2);
+            position: absolute;
+            z-index: 2;
+            right: 0px;
+        }
+        .boxR:hover,.boxL:hover{
+            background-color: #f1f1f1;
+            color: black;
+            cursor: pointer;
+        }
+        i {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+        }
+
+        .boxcent {
+            width: 900px;
+            height: 300px;
+            position: absolute;
+            /*background-color: aliceblue;*/
+            top:25%;
+            left: 17%;
+            z-index: 2;
+        }
+        .boxcent button{
+            width: 100px;
+            height: 40px;
+            position: absolute;
+            left: 48%;
+            top: 90%;
+        }
+        .boxcent span{
+            position: absolute;
+            z-index: 5;
+            left: 49%;
+            top:-20px;
+            color: #ff7d23;
+        }
+        .boxcent .boxcontent{
+            width: 600px;
+            height: 200px;
+            /*background-color: blueviolet;*/
+            position: absolute;
+            left: 20%;
+            top: 25%;
+        }
+        .boxcontent p{
+            text-align: center;
+            font-size: 20px;
+            color: black;
+            font-family: cursive;
+        }
+        .Right-panel{
+            height: 100%;
+            width: 100%;
+            position: fixed;
+            z-index: 10;
+            top: 0;
+            right: 0;
+            background: url("image/page2.jpg") center center fixed no-repeat;
+            background-size:cover;
+            overflow-x: hidden;
+            transition: 0.5s;
+        }
+        @media screen and (max-height: 450px) {
+            .Right-panel {padding-top: 15px;}
+            .left-panel {padding-top: 15px;}
+        }
+        .left-panel{
+            height: 100%;
+            width: 100%;
+            position: fixed;
+            z-index: 10;
+            top: 0;
+            left: 0;
+            background: url("image/page1.jpg") center center fixed no-repeat;
+            background-size:cover;
+            overflow-x: hidden;
+            transition: 0.5s;
+        }
+    </style>
+</head>
+<body>
+<div class="box">
+    <div class="boxL hvr-pop" onclick="openTutorial()">
+        <span style="font-size: 17px;position: relative;top:50%;color:#e2e2e2" class="fas">&#xf104;IMAP使用教學</span>
+<!--        <i style='font-size:50px' class='fas'></i>-->
+    </div>
+
+    <div class="boxcent">
+        <span><img src="IMAPicon.png"></span>
+        <div class="boxcontent">
+            <p>2020/05/13 : IMAP 創立</p>
+            <p>2020/05/13 : 資料庫更新</p>
+            <p>2020/05/13 : 旅遊資料更新囉</p>
+            <p>2020/05/13 : 趕快訂閱IMAP</p>
+        </div>
+        <button type="button" class="btn btn-danger" onclick="self.location.href='IMAP.html'">進入地圖</button>
+    </div>
+
+    <div class="boxR hvr-pop" onclick="openAnn()">
+        <span style="font-size: 17px;position: relative;top:50%;right: -50px;color:#e2e2e2" class="fas">IMAP公告&#xf105;</span>
+    </div>
+
+    <div class="left-panel" id="Tutorial">
+        <div class="boxR hvr-pop" style="z-index: 15 ;color:#e2e2e2" onclick="closeTutorial()"><span style="font-size: 17px;position: relative;top:50%;right: -50px" class="fas">回到首頁&#xf105;</span></div>
+    </div>
+
+    <div class="Right-panel" id="announcement">
+        <div class="boxL hvr-pop" style="z-index: 15 ;color:#e2e2e2" onclick="closeAnn()"><span style="font-size: 17px;position: relative;top:50%;right: -50px" class="fas">&#xf104;回到首頁</span></div>
+    </div>
+
+</div>
+
+
+
+<script>
+    function openTutorial() {
+        document.getElementById("Tutorial").style.width = "100vw";
+    }
+
+    function closeTutorial() {
+        document.getElementById("Tutorial").style.width = "0";
+    }
+    function openAnn() {
+        document.getElementById("announcement").style.width = "100vw";
+    }
+
+    function closeAnn() {
+        document.getElementById("announcement").style.width = "0";
+    }
+</script>
+</body>
+</html>
